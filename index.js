@@ -76,7 +76,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import userRoute from './routes/users.js';
-import authRoute from './routes/auth.js';
+//import authRoute from './routes/auth.js';
 // import eventRoute from './routes/events.js';
 // import reviewRoute from './routes/reviews.js';
 // import bookingRoute from './routes/bookings.js';
@@ -115,12 +115,8 @@ app.get('/db-check', (req, res) => {
   });
 });
 
-app.use('/api/v1/auth', authRoute);
+//app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/users', userRoute);
-// app.use('/api/v1/events', eventRoute);
-// app.use('/api/v1/review', reviewRoute);
-// app.use('/api/v1/booking', bookingRoute);
-// app.use('/api/v1/timeslot', timeslotRoute);
 
 // MongoDB and server startup
 const startServer = async () => {
