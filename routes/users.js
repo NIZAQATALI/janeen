@@ -14,5 +14,4 @@ router.get('/adult/getAllChild', verifyJWT,getAllChildren)
 router.get('/getchildbyid/:id', verifyJWT, getChildById)
 router.post('/child/createChild', createChild)
 router.get('/', getAllUsers)
-
 export default router
