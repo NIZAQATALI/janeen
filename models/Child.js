@@ -57,8 +57,8 @@ const childSchema = new mongoose.Schema(
     age: { type: Number, required: true },
     email: { type: String, required: true, unique: true }, // needed for login
     password: { type: String, required: true },            // needed for login
-    role: { type: String, enum: ["child", "user"], default: "child" },
-    gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
+    role: { type: String, enum: ["child"], default: "child" },
+    gender: { type: String, enum: ["Male", "Female", "Child"], required: true },
 
     // New fields based on requirements
     category: {

@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
     general_health: { type: String },
     password: { type: String, required: true },
     photo: { type: String },
-    phone_number: { type: Number },
+    phone_number: { type: String },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     children: [
       {
