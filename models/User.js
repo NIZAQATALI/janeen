@@ -4,9 +4,9 @@ import bcrypt from "bcryptjs";
 const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    age: { type: Number, required: true },
-    gender: { type: String, enum: ["Male", "Female", "Other"], required: true },  
+    email: { type: String, required: true, },
+    age: { type: Number, },
+    gender: { type: String, enum: ["Male", "Female", "Other"]},  
     maritalStatus: {
       type: String,
       enum: ["Married", "Unmarried"],
@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     },
     // General health toggle
     general_health: { type: String },
-    password: { type: String, required: true },
+    password: { type: String, },
     photo: { type: String },
     phone_number: { type: String },
     role: { type: String, enum: ["user", "admin"], default: "user" },
@@ -40,7 +40,10 @@ const userSchema = new mongoose.Schema(
         ref: "Child",
       },
     ],
-  
+       // 🆕 Google fields
+    googleId: { type: String },
+    provider: { type: String, enum: ["local", "google"], default: "local" },
+        isGoogleUser: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
