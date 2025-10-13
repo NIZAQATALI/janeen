@@ -1,14 +1,12 @@
 
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-
 const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     age: { type: Number, required: true },
-    gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
-    // Marital status
+    gender: { type: String, enum: ["Male", "Female", "Other"], required: true },  
     maritalStatus: {
       type: String,
       enum: ["Married", "Unmarried"],
@@ -25,13 +23,11 @@ const userSchema = new mongoose.Schema(
         return this.pregnancyStage === "Pregnancy";
       },
     },
-
     // Male-specific
     fatherStatus: {
       type: String,
       enum: ["Father", "PlanningToBeFather"],
     },
-
     // General health toggle
     general_health: { type: String },
     password: { type: String, required: true },
@@ -44,6 +40,7 @@ const userSchema = new mongoose.Schema(
         ref: "Child",
       },
     ],
+  
   },
   { timestamps: true }
 );

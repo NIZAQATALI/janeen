@@ -2,8 +2,76 @@ import User from '../models/User.js';
 import Child from '../models/Child.js';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import VerificationCode from "../models/Verify.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js"; 
 // Create a new user
+// export const createNewUser = async (req, res) => {
+//   const {
+//     username,
+//     email,
+//     password,
+//     role,
+//     age,
+//     gender,
+//     maritalStatus,
+//     pregnancyStage,   // updated
+//     trimester,        // updated
+//     fatherStatus,     // updated
+//     general_health,
+//     phone_number
+//   } = req.body;
+
+//   const file = req.file?.path;
+//   let photoUrl = null;
+
+//   try {
+//     if (file) {
+//       const cloudinaryResponse = await uploadOnCloudinary(file, "users");
+//       if (cloudinaryResponse) {
+//         photoUrl = cloudinaryResponse.secure_url;
+//       } else {
+//         return res.status(500).json({
+//           status: "failed",
+//           success: false,
+//           message: "Photo upload to Cloudinary failed. User not created.",
+//         });
+//       }
+//     }
+
+//     const newUser = new User({
+//       username,
+//       email,
+//       password,
+//       role,
+//       age,
+//       gender,
+//       maritalStatus,
+//       pregnancyStage,
+//       trimester,
+//       fatherStatus,
+//       general_health,
+//       phone_number,
+//       ...(photoUrl && { photo: photoUrl }),
+//     });
+
+//     const savedUser = await newUser.save();
+
+//     res.status(201).json({
+//       status: "success",
+//       success: true,
+//       message: "User successfully created",
+//       data: savedUser,
+//     });
+//   } catch (err) {
+//     console.error("Error creating user:", err);
+//     res.status(500).json({
+//       status: "failed",
+//       success: false,
+//       message: "User cannot be created. Try again.",
+//       error: err.message,
+//     });
+//   }
+// };
 export const createNewUser = async (req, res) => {
   const {
     username,
@@ -13,30 +81,47 @@ export const createNewUser = async (req, res) => {
     age,
     gender,
     maritalStatus,
-    pregnancyStage,   // updated
-    trimester,        // updated
-    fatherStatus,     // updated
+    pregnancyStage,
+    trimester,
+    fatherStatus,
     general_health,
-    phone_number
+    phone_number,
+    verificationCode, 
   } = req.body;
 
   const file = req.file?.path;
   let photoUrl = null;
 
   try {
+    console.log(verificationCode,"both...." )
+    // 1️⃣ Validate verification code
+    const validCode = await VerificationCode.findOne({
+      email,
+      code: verificationCode,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!validCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired verification code.",
+      });
+    }
+
+    // 2️⃣ Upload photo if provided
     if (file) {
       const cloudinaryResponse = await uploadOnCloudinary(file, "users");
       if (cloudinaryResponse) {
         photoUrl = cloudinaryResponse.secure_url;
       } else {
         return res.status(500).json({
-          status: "failed",
           success: false,
-          message: "Photo upload to Cloudinary failed. User not created.",
+          message: "Photo upload to Cloudinary failed.",
         });
       }
     }
 
+    // 3️⃣ Create and save user
     const newUser = new User({
       username,
       email,
@@ -55,27 +140,26 @@ export const createNewUser = async (req, res) => {
 
     const savedUser = await newUser.save();
 
+    // 4️⃣ Delete used verification code
+    await VerificationCode.deleteOne({ _id: validCode._id });
+
     res.status(201).json({
-      status: "success",
       success: true,
-      message: "User successfully created",
+      message: "User successfully created and verified",
       data: savedUser,
     });
   } catch (err) {
     console.error("Error creating user:", err);
     res.status(500).json({
-      status: "failed",
       success: false,
       message: "User cannot be created. Try again.",
       error: err.message,
     });
   }
 };
-
 // Login User
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -124,13 +208,11 @@ export const loginUser = async (req, res) => {
     });
   }
 };
-
 // Update User
 export const updateUser = async (req, res) => {
   const id = req.query.id;
   const file = req.file?.path;
   let photoUrl = null;
-
   try {
     if (file) {
       const cloudinaryResponse = await uploadOnCloudinary(file, 'users');

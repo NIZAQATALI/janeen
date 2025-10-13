@@ -1,9 +1,6 @@
 import express  from "express";
-import { login, register } from "../Controllers/authController.js";
-
+import { sendVerificationCode} from "../Controllers/verficationController.js";
+ import { upload } from '../MiddleWares/multer.middleware.js';
 const router = express.Router()              
-
-router.post('/register', register)
-router.post('/login', login)
-
+router.post('/send-verification-code',upload.single('file'),sendVerificationCode)
 export default router
