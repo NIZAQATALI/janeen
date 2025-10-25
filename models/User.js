@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["Married", "Unmarried"],
     },
-    // Female-specific
+   
     pregnancyStage: {
       type: String,
       enum: ["Pre-Pregnancy", "Pregnancy", "Post-Pregnancy"],
@@ -23,12 +23,12 @@ const userSchema = new mongoose.Schema(
         return this.pregnancyStage === "Pregnancy";
       },
     },
-    // Male-specific
+
     fatherStatus: {
       type: String,
       enum: ["Father", "PlanningToBeFather"],
     },
-    // General health toggle
+
     general_health: { type: String },
     password: { type: String, },
     photo: { type: String },
@@ -40,20 +40,20 @@ const userSchema = new mongoose.Schema(
         ref: "Child",
       },
     ],
-       // 🆕 Google fields
+   
     googleId: { type: String },
     provider: { type: String, enum: ["local", "google"], default: "local" },
         isGoogleUser: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
-// Hash password before saving
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
-// Compare password
+
 userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
