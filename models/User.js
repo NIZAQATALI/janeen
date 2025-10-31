@@ -1,49 +1,33 @@
-
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { ENUMS } from "../utils/constant/constant.js"; 
+
 const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
-    email: { type: String, required: true, },
-    age: { type: Number, },
-    gender: { type: String, enum: ["Male", "Female", "Other"]},  
-    maritalStatus: {
-      type: String,
-      enum: ["Married", "Unmarried"],
-    },
-   
-    pregnancyStage: {
-      type: String,
-      enum: ["Pre-Pregnancy", "Pregnancy", "Post-Pregnancy"],
-    },
+    email: { type: String, required: true },
+    age: { type: Number },
+    gender: { type: String, enum: ENUMS.GENDER },
+    maritalStatus: { type: String, enum: ENUMS.MARITAL_STATUS },
+    pregnancyStage: { type: String, enum: ENUMS.PREGNANCY_STAGE },
     trimester: {
       type: String,
-      enum: ["trimester-1", "trimester-2", "trimester-3"],
+      enum: ENUMS.TRIMESTER,
       required: function () {
         return this.pregnancyStage === "Pregnancy";
       },
     },
-
-    fatherStatus: {
-      type: String,
-      enum: ["Father", "PlanningToBeFather"],
-    },
-
+    pregnancyStartDate: { type: Date },
+    fatherStatus: { type: String, enum: ENUMS.FATHER_STATUS },
     general_health: { type: String },
-    password: { type: String, },
+    password: { type: String },
     photo: { type: String },
     phone_number: { type: String },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
-    children: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Child",
-      },
-    ],
-   
+    role: { type: String, enum: ENUMS.ROLE, default: "user" },
+    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Child" }],
     googleId: { type: String },
-    provider: { type: String, enum: ["local", "google"], default: "local" },
-        isGoogleUser: { type: Boolean, default: false },
+    provider: { type: String, enum: ENUMS.PROVIDER, default: "local" },
+    isGoogleUser: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -57,4 +41,5 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
+
 export default mongoose.model("User", userSchema);

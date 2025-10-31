@@ -4,94 +4,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import VerificationCode from "../models/Verify.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js"; 
-// export const createNewUser = async (req, res) => {
-//   const {
-//     username,
-//     email,
-//     password,
-//     role,
-//     age,
-//     gender,
-//     maritalStatus,
-//     pregnancyStage,
-//     trimester,
-//     fatherStatus,
-//     general_health,
-//     phone_number,
-//     verificationCode, 
-//   } = req.body;
-
-//   const file = req.file?.path;
-//   let photoUrl = null;
-
-//   try {
-//     console.log(verificationCode,"both....")
-//   console.log(  typeof(verificationCode))
-//     // 1️⃣ Validate verification code
-//     const validCode = await VerificationCode.findOne({
-//       email,
-//       code: verificationCode,
-//       expiresAt: { $gt: new Date() },
-//     });
-// console.log(validCode)
-//     if (!validCode) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid or expired verification code.",
-//       });
-//     }
-
-
-//     if (file) {
-//       const cloudinaryResponse = await uploadOnCloudinary(file, "users");
-//       if (cloudinaryResponse) {
-//         photoUrl = cloudinaryResponse.secure_url;
-//       } else {
-//         return res.status(500).json({
-//           success: false,
-//           message: "Photo upload to Cloudinary failed.",
-//         });
-//       }
-//     }
-
-
-//     const newUser = new User({
-//       username,
-//       email,
-//       password,
-//       role,
-//       age,
-//       gender,
-//       maritalStatus,
-//       pregnancyStage,
-//       trimester,
-//       fatherStatus,
-//       general_health,
-//       phone_number,
-//       ...(photoUrl && { photo: photoUrl }),
-//     });
-
-//     const savedUser = await newUser.save();
-
-   
-//     await VerificationCode.deleteOne({ _id: validCode._id });
-
-//     res.status(201).json({
-//       success: true,
-//       message: "User successfully created and verified",
-//       data: savedUser,
-//     });
-//   } catch (err) {
-//     console.error("Error creating user:", err);
-//     res.status(500).json({
-//       success: false,
-//       message: "User cannot be created. Try again.",
-//       error: err.message,
-//     });
-//   }
-// };
-
-
+import { getPregnancyInfo } from "../utils/constant/userState.js"; 
+import { getChildCategory } from "../utils/constant/childState.js"; 
 export const createNewUser = async (req, res) => {
   try {
     const {
@@ -107,6 +21,7 @@ export const createNewUser = async (req, res) => {
       fatherStatus,
       general_health,
       phone_number,
+      pregnancyStartDate,
       verificationCode,
     } = req.body;
 
@@ -168,6 +83,7 @@ console.log(normalizedEmail,"normalized email")
       fatherStatus,
       general_health,
       phone_number,
+      pregnancyStartDate,
       ...(photoUrl && { photo: photoUrl }),
     });
 
@@ -286,7 +202,6 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// Delete User
 export const deleteUser = async (req, res) => {
   const id = req.query.id;
   try {
@@ -305,11 +220,44 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// Get Single User
+
+// export const getSingleUser = async (req, res) => {
+//        const id = req.query.id || req.user._id;
+//   try {
+//     const singleUser = await User.findOne({ _id: id }).select("-password");
+//     if (!singleUser) {
+//       return res.status(404).json({
+//         status: "failed",
+//         success: false,
+//         message: "User not found.",
+//       });
+//     }
+//     res.status(200).json({
+//       status: "success",
+//       success: true,
+//       message: "Successful",
+//       data: singleUser,
+//     });
+//   } catch (err) {
+//     res.status(500).json({
+//       status: "failed",
+//       success: false,
+//       message: "Could not fetch user data.",
+//       error: err.message,
+//     });
+//   }
+// };
+
+// Get All Users
+
+
+
 export const getSingleUser = async (req, res) => {
   const id = req.query.id || req.user._id;
+
   try {
     const singleUser = await User.findOne({ _id: id }).select("-password");
+
     if (!singleUser) {
       return res.status(404).json({
         status: "failed",
@@ -317,11 +265,18 @@ export const getSingleUser = async (req, res) => {
         message: "User not found.",
       });
     }
+
+  
+    const pregnancyInfo = getPregnancyInfo(singleUser);
+
     res.status(200).json({
       status: "success",
       success: true,
       message: "Successful",
-      data: singleUser,
+      data: {
+        ...singleUser.toObject(), 
+        pregnancyInfo,           
+      },
     });
   } catch (err) {
     res.status(500).json({
@@ -333,7 +288,6 @@ export const getSingleUser = async (req, res) => {
   }
 };
 
-// Get All Users
 export const getAllUsers = async (req, res) => {
   try {
     const allUsers = await User.find({});
@@ -358,17 +312,16 @@ export const getAllUsers = async (req, res) => {
 
 export const createChild = async (req, res) => {
   try {
-    const { name, age, gender, parentId, email, password, category, ageRange } = req.body;
-
+    const { name, age, gender, parentId, email, password, category, ageRange,birthDate } = req.body;
     const parent = await User.findById(parentId);
     if (!parent) {
       return res.status(404).json({ message: "Parent not found" });
     }
-
     const newChild = new Child({
       name,
       age,
       gender,
+      birthDate,
       parent: parentId,
       email,
       password,
@@ -376,7 +329,6 @@ export const createChild = async (req, res) => {
       category,
       ageRange,
     });
-
     const savedChild = await newChild.save();
 
     parent.children.push(savedChild._id);
@@ -411,6 +363,56 @@ export const getAllChildren = async (req, res) => {
 };
 
 
+// export const getChildById = async (req, res) => {
+//   try {
+//     const { id: userId, role } = req.user;
+//     const { id: childId } = req.params;
+
+//     let child;
+
+//     if (role === "user") {
+//       child = await Child.findOne({ _id: childId, parent: userId });
+//       if (!child) {
+//         return res.status(404).json({ message: "Child not found or not your child" });
+//       }
+//       return res.status(200).json({
+//         message: "Child fetched successfully (parent view)",
+//         data: child,
+//       });
+//     }
+
+//     if (role === "child") {
+//       if (userId !== childId) {
+//         return res.status(403).json({ message: "Access denied — you can only view your own data" });
+//       }
+
+//       child = await Child.findById(childId);
+//       if (!child) {
+//         return res.status(404).json({ message: "Child not found" });
+//       }
+
+//       return res.status(200).json({
+//         message: "Child fetched successfully (child view)",
+//         data: {
+//           id: child._id,
+//           name: child.name,
+//           age: child.age,
+//           category: child.category,
+//           ageRange: child.ageRange,
+//         },
+//       });
+//     }
+
+//     return res.status(403).json({ message: "Unauthorized role" });
+//   } catch (error) {
+//     console.error("Error fetching child:", error);
+//     return res.status(500).json({
+//       message: "Error fetching child",
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const getChildById = async (req, res) => {
   try {
     const { id: userId, role } = req.user;
@@ -418,20 +420,33 @@ export const getChildById = async (req, res) => {
 
     let child;
 
+  
     if (role === "user") {
       child = await Child.findOne({ _id: childId, parent: userId });
       if (!child) {
-        return res.status(404).json({ message: "Child not found or not your child" });
+        return res.status(404).json({
+          message: "Child not found or not your child",
+        });
       }
+
+    
+      const childState = getChildCategory(child);
+
       return res.status(200).json({
         message: "Child fetched successfully (parent view)",
-        data: child,
+        data: {
+          ...child.toObject(),
+          childState, 
+        },
       });
     }
 
+    // 👦 Child accessing their own data
     if (role === "child") {
       if (userId !== childId) {
-        return res.status(403).json({ message: "Access denied — you can only view your own data" });
+        return res.status(403).json({
+          message: "Access denied — you can only view your own data",
+        });
       }
 
       child = await Child.findById(childId);
@@ -439,14 +454,19 @@ export const getChildById = async (req, res) => {
         return res.status(404).json({ message: "Child not found" });
       }
 
+    
+      const childState = getChildCategory(child);
+
       return res.status(200).json({
         message: "Child fetched successfully (child view)",
         data: {
           id: child._id,
           name: child.name,
-          age: child.age,
+          email: child.email,
+          gender: child.gender,
           category: child.category,
           ageRange: child.ageRange,
+          childState,
         },
       });
     }
@@ -460,8 +480,6 @@ export const getChildById = async (req, res) => {
     });
   }
 };
-
-
 
 
 export const childLogin = async (req, res) => {
