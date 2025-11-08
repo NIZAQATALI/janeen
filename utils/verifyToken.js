@@ -79,15 +79,29 @@ export const verifyUser = (req, res, next)=>{
 }
 
 //3) TO VERIFY ADMIN
-export const verifyAdmin = (req, res, next)=>{
+// export const verifyAdmin = (req, res, next) => {
+//     verifyToken(req, res, next, () => {
+//         console.log(`Role inside callback: '${req.user.role}'`);
+//         if (req.user.role && req.user.role.trim() === 'admin') {
+//             next();
+//         } else {
+//             return res.status(401).json({
+//                 status: "failed",
+//                 success: "false",
+//                 message: "You are not Authorized"
+//             });
+//         }
+//     });
+// };
+// middleware/verifyAdmin.js
+export const verifyAdmin = (req, res, next) => {
+    if (req.user && req.user.role === "admin") {
+        return next();
+    } 
+    return res.status(401).json({
+        status: "failed",
+        success: false,
+        message: "You are not Authorized",
+    });
+};
 
-    verifyToken(req, res, next, ()=>{
-        if(req.user.role === 'admin'){
-            next()
-        }else{
-            return res.status(401).json({status: "failed", success:"false", 
-                                         message: "You are not Authorized"})
-        }
-    })
-
-}

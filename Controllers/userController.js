@@ -6,6 +6,8 @@ import VerificationCode from "../models/Verify.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js"; 
 import { getPregnancyInfo } from "../utils/constant/userState.js"; 
 import { getChildCategory } from "../utils/constant/childState.js"; 
+import Notificationprefrence from '../models/Notificationprefrence.js';
+import Notification from '../models/Notification.js';
 export const createNewUser = async (req, res) => {
   try {
     const {
@@ -248,16 +250,50 @@ export const deleteUser = async (req, res) => {
 //   }
 // };
 
-// Get All Users
 
 
+// export const getSingleUser = async (req, res) => {
+//   const id = req.query.id || req.user._id;
+
+//   try {
+//     const singleUser = await User.findOne({ _id: id }).select("-password");
+
+//     if (!singleUser) {
+//       return res.status(404).json({
+//         status: "failed",
+//         success: false,
+//         message: "User not found.",
+//       });
+//     }
+
+  
+//     const pregnancyInfo = getPregnancyInfo(singleUser);
+
+//     res.status(200).json({
+//       status: "success",
+//       success: true,
+//       message: "Successful",
+//       data: {
+//         ...singleUser.toObject(), 
+//         pregnancyInfo,           
+//       },
+//     });
+//   } catch (err) {
+//     res.status(500).json({
+//       status: "failed",
+//       success: false,
+//       message: "Could not fetch user data.",
+//       error: err.message,
+//     });
+//   }
+// };
 
 export const getSingleUser = async (req, res) => {
-  const id = req.query.id || req.user._id;
-
+  const id =  req.user._id;
+console.log(id,"id.............")
   try {
     const singleUser = await User.findOne({ _id: id }).select("-password");
-
+    console.log(singleUser,"singleUser")
     if (!singleUser) {
       return res.status(404).json({
         status: "failed",
@@ -266,16 +302,19 @@ export const getSingleUser = async (req, res) => {
       });
     }
 
-  
     const pregnancyInfo = getPregnancyInfo(singleUser);
+    const preference = await Notificationprefrence.find({ userId: singleUser._id });
+    const notifications = await Notification.find({ userId: singleUser._id, status: "scheduled" });
 
     res.status(200).json({
       status: "success",
       success: true,
-      message: "Successful",
+      message: "User fetched successfully",
       data: {
-        ...singleUser.toObject(), 
-        pregnancyInfo,           
+        ...singleUser.toObject(),
+        pregnancyInfo,
+        notificationPreferences: preference,
+        pendingNotifications: notifications,
       },
     });
   } catch (err) {
