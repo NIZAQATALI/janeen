@@ -30,3 +30,74 @@ export const createOrUpdateTemplate = async (req, res) => {
     });
   }
 };
+
+
+
+export const getAllTemplates = async (req, res) => {
+  try {
+    const templates = await NotificationTemplate.find({});
+    res.status(200).json({
+      success: true,
+      count: templates.length,
+      data: templates,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Could not fetch templates",
+      error: error.message,
+    });
+  }
+};
+
+
+export const getSingleTemplate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const template = await NotificationTemplate.findById(id);
+
+    if (!template) {
+      return res.status(404).json({
+        success: false,
+        message: "Template not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: template,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Could not fetch template",
+      error: error.message,
+    });
+  }
+};
+
+
+export const deleteTemplate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const template = await NotificationTemplate.findByIdAndDelete(id);
+
+    if (!template) {
+      return res.status(404).json({
+        success: false,
+        message: "Template not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Template deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Could not delete template",
+      error: error.message,
+    });
+  }
+};
