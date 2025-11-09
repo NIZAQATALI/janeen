@@ -43,11 +43,16 @@ export const verifyJWT = async (req, res, next) => {
 
     let user;
 
-    if (role === "user") {
+    if (role =="user") {
       user = await User.findById(id).select("-password");
-    } else if (role === "child") {
+    } 
+    else if (role =="child") {
         console.log("childdddddd")
       user = await Child.findById(id).select("-password");
+    }
+    else {
+        console.log("admin.................................")
+      user = await User.findById(id).select("-password");
     }
         console.log(user,"req.user")
         if (!user) {
