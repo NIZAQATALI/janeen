@@ -9,7 +9,7 @@ import {
   setNotificationPreference,   
 } from "../Controllers/notificationPrefrenceController.js";
 import {
-  createUserNotification,        
+      
   getUserNotifications,          
   markAsRead,                    
   deleteNotification,           
@@ -24,7 +24,7 @@ router.get("/admin/template", verifyJWT, verifyAdmin, getAllTemplates);
 router.get("/admin/template/:id", verifyJWT, verifyAdmin, getSingleTemplate);
 router.delete("/admin/template/:id", verifyJWT, verifyAdmin, deleteTemplate);
 router.post("/preference", verifyJWT, setNotificationPreference);
-router.post("/", verifyJWT, createUserNotification);
+
 router.get("/", verifyJWT, getUserNotifications);
 router.patch("/read/:id", verifyJWT, markAsRead);
 router.delete("/:id", verifyJWT, deleteNotification);

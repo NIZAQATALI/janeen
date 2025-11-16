@@ -1,80 +1,8 @@
 // controllers/notificationController.js
 
+//import Notification from "../models/Notification.js";
 import Notification from "../models/Notification.js";
 import agenda from "../utils/agenda.js"; // Your Agenda instance
-
-
-export const createUserNotification = async (req, res) => {
-  try {
-    const { title, message, type } = req.body;
-    const userId = req.user._id;
-
-    if (!title || !message || !type) {
-      return res.status(400).json({
-        success: false,
-        message: "Title, message, and type are required",
-      });
-    }
-
-    // Save notification in DB
-    const notification = await Notification.create({
-      userId,
-      title,
-      message,
-      type,
-      status: type === "urgent" ? "sent" : "scheduled",
-    });
-
-    // Handle notification type
-    if (type === "urgent") {
-      req.io.to(userId.toString()).emit("notification", {
-        title,
-        message,
-        time: new Date(),
-      });
-    } else {
-      let scheduleTime;
-      switch (type) {
-        case "daily":
-          scheduleTime = "in 1 day";
-          break;
-        case "weekly":
-          scheduleTime = "in 1 week";
-          break;
-        case "monthly":
-          scheduleTime = "in 1 month";
-          break;
-        default:
-          return res.status(400).json({
-            success: false,
-            message: "Invalid type. Must be daily, weekly, monthly, or urgent",
-          });
-      }
-
-      await agenda.schedule(scheduleTime, "sendNotification", {
-        userId,
-        title,
-        message,
-      });
-    }
-
-    return res.status(201).json({
-      success: true,
-      message:
-        type === "urgent"
-          ? "Urgent notification sent"
-          : "Notification scheduled successfully",
-      data: notification,
-    });
-  } catch (error) {
-    console.error("Notification Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to send notification",
-      error: error.message,
-    });
-  }
-};
 
 /* ------------------ GET USER NOTIFICATIONS ------------------ */
 export const getUserNotifications = async (req, res) => {
@@ -94,8 +22,7 @@ export const getUserNotifications = async (req, res) => {
     });
   }
 };
-
-/* ------------------ MARK NOTIFICATION AS READ ------------------ */
+  
 export const markAsRead = async (req, res) => {
   try {
     const userId = req.user._id;

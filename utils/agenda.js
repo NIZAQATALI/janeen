@@ -1,24 +1,34 @@
+
 import Agenda from "agenda";
 import NotificationTemplate from "../models/Notificationtemplate.js";
 import NotificationPreference from "../models/Notificationprefrence.js";
 import Notification from "../models/Notification.js";
-import mongoose from "mongoose";
 
 let agenda;
 
 export const startAgenda = async (io) => {
   agenda = new Agenda({
-    db: { address: process.env.MONGODB_URL, collection: "agendaJobs" },
+    db: {
+      address: process.env.MONGODB_URL,
+      collection: "agendaJobs",
+    },
   });
 
-  // ----- DAILY JOB -----
+  // ---------------- DAILY ----------------
   agenda.define("send-daily-notifications", async () => {
-    const template = await NotificationTemplate.findOne({ type: "daily" });
-    if (!template) return;
-
     const users = await NotificationPreference.find({ frequency: "daily" });
 
     for (const user of users) {
+      // stage-based template selection
+      const template = await NotificationTemplate.findOne({
+        type: "daily",
+        category: user.category,      // baby/pregnancy/men
+        stageType: user.stageType,    // month/year/trimester/general
+        stageValue: user.stageValue,  // 1 year or 3rd trimester etc.
+      });
+
+      if (!template) continue;
+
       const notification = await Notification.create({
         userId: user.userId,
         title: template.title,
@@ -30,14 +40,20 @@ export const startAgenda = async (io) => {
     }
   });
 
-  // ----- WEEKLY JOB -----
+  // ---------------- WEEKLY ----------------
   agenda.define("send-weekly-notifications", async () => {
-    const template = await NotificationTemplate.findOne({ type: "weekly" });
-    if (!template) return;
-
     const users = await NotificationPreference.find({ frequency: "weekly" });
 
     for (const user of users) {
+      const template = await NotificationTemplate.findOne({
+        type: "weekly",
+        category: user.category,
+        stageType: user.stageType,
+        stageValue: user.stageValue,
+      });
+
+      if (!template) continue;
+
       const notification = await Notification.create({
         userId: user.userId,
         title: template.title,
@@ -49,14 +65,20 @@ export const startAgenda = async (io) => {
     }
   });
 
-  // ----- MONTHLY JOB -----
+  // ---------------- MONTHLY ----------------
   agenda.define("send-monthly-notifications", async () => {
-    const template = await NotificationTemplate.findOne({ type: "monthly" });
-    if (!template) return;
-
     const users = await NotificationPreference.find({ frequency: "monthly" });
 
     for (const user of users) {
+      const template = await NotificationTemplate.findOne({
+        type: "monthly",
+        category: user.category,
+        stageType: user.stageType,
+        stageValue: user.stageValue,
+      });
+
+      if (!template) continue;
+
       const notification = await Notification.create({
         userId: user.userId,
         title: template.title,
@@ -68,14 +90,15 @@ export const startAgenda = async (io) => {
     }
   });
 
+  // START AGENDA
   await agenda.start();
 
-  // RUN SCHEDULES (all at 9:00 AM)
-  await agenda.every("0 9 * * *", "send-daily-notifications");     // daily at 9am
-  await agenda.every("0 9 * * 1", "send-weekly-notifications");     // every Monday 9am
-  await agenda.every("0 9 1 * *", "send-monthly-notifications");    // 1st of every month 9am
+  // Run jobs at 9 AM
+  await agenda.every("0 9 * * *", "send-daily-notifications");
+  await agenda.every("0 9 * * 1", "send-weekly-notifications");
+  await agenda.every("0 9 1 * *", "send-monthly-notifications");
 
-  console.log("⏳ Agenda Jobs Scheduled at 9:00 AM Daily/Weekly/Monthly");
+  console.log("⏳ Agenda Jobs Scheduled with Stage-Based Notifications");
 };
 
 export default agenda;
