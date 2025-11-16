@@ -345,7 +345,78 @@ export const getAllUsers = async (req, res) => {
     });
   }
 };
+export const getAppAnalytics = async (req, res) => {
+  try {
+  
+    const totalUsers = await User.countDocuments();
+    const totalChildren = await Child.countDocuments();
 
+  
+    const totalAppUsers = totalUsers + totalChildren;
+
+   
+    const maleUsers = await User.countDocuments({ gender: "Male" });
+    const femaleUsers = await User.countDocuments({ gender: "Female" });
+
+   
+    const pregnantWomen = await User.countDocuments({
+      gender: "Female",
+      pregnancyStage: "Pregnancy",
+    });
+
+   
+    const nonPregnantWomen = await User.countDocuments({
+      gender: "Female",
+      pregnancyStage: { $ne: "Pregnancy" },
+    });
+
+    const fathers = await User.countDocuments({
+      gender: "Male",
+      fatherStatus: "Father",
+    });
+
+  
+    const marriedWomen = await User.countDocuments({
+      gender: "Female",
+      maritalStatus: "Married",
+    });
+
+    
+    const usersWithChildren = await User.countDocuments({
+      children: { $exists: true, $ne: [] },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "App analytics fetched successfully",
+      data: {
+        totalAppUsers,   
+        totalUsers,     
+        totalChildren,   
+        genderStats: {
+          maleUsers,
+          femaleUsers,
+        },
+        pregnancyStats: {
+          pregnantWomen,
+          nonPregnantWomen,
+        },
+        parentStats: {
+          fathers,
+          marriedWomen,
+          usersWithChildren,
+        },
+      },
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch analytics",
+      error: error.message,
+    });
+  }
+};
 // ------------------ CHILD CONTROLLERS ------------------
 
 
