@@ -94,7 +94,8 @@ export const startAgenda = async (io) => {
   await agenda.start();
 
   // Run jobs at 9 AM
-  await agenda.every("0 9 * * *", "send-daily-notifications");
+ // await agenda.every("0 9 * * *", "send-daily-notifications");
+ await agenda.every("*/1 * * * *", "send-daily-notifications");
   await agenda.every("0 9 * * 1", "send-weekly-notifications");
   await agenda.every("0 9 1 * *", "send-monthly-notifications");
 
