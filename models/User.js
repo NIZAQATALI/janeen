@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String },
     provider: { type: String, enum: ENUMS.PROVIDER, default: "local" },
     isGoogleUser: { type: Boolean, default: false },
+    lastLogin: {
+  type: Date,
+  default: null,
+}
+
   },
   { timestamps: true }
 );

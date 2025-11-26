@@ -13,7 +13,12 @@ const childSchema = new mongoose.Schema(
     gender: { type: String, enum: ENUMS.CHILD_GENDER, required: true },
     category: { type: String, enum: ENUMS.CHILD_CATEGORY, required: true },
     ageRange: { type: String, enum: ENUMS.CHILD_AGE_RANGE },
-    parent: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    lastLogin: {
+  type: Date,
+  default: null,
+}
+
   },
   { timestamps: true }
 );

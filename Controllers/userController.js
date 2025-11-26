@@ -130,6 +130,8 @@ export const loginUser = async (req, res) => {
       });
     }
 
+      user.lastLogin = new Date();
+    await user.save();
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET_KEY,
@@ -345,62 +347,173 @@ export const getAllUsers = async (req, res) => {
     });
   }
 };
-export const getAppAnalytics = async (req, res) => {
-  try {
+// export const getAppAnalytics = async (req, res) => {
+//   try {
   
-    const totalUsers = await User.countDocuments();
-    const totalChildren = await Child.countDocuments();
+//     const totalUsers = await User.countDocuments();
+//     const totalChildren = await Child.countDocuments();
 
   
-    const totalAppUsers = totalUsers + totalChildren;
+//     const totalAppUsers = totalUsers + totalChildren;
 
    
+//     const maleUsers = await User.countDocuments({ gender: "Male" });
+//     const femaleUsers = await User.countDocuments({ gender: "Female" });
+
+   
+//     const pregnantWomen = await User.countDocuments({
+//       gender: "Female",
+//       pregnancyStage: "Pregnancy",
+//     });
+
+   
+//     const nonPregnantWomen = await User.countDocuments({
+//       gender: "Female",
+//       pregnancyStage: { $ne: "Pregnancy" },
+//     });
+
+//     const fathers = await User.countDocuments({
+//       gender: "Male",
+//       fatherStatus: "Father",
+//     });
+
+  
+//     const marriedWomen = await User.countDocuments({
+//       gender: "Female",
+//       maritalStatus: "Married",
+//     });
+
+    
+//     const usersWithChildren = await User.countDocuments({
+//       children: { $exists: true, $ne: [] },
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "App analytics fetched successfully",
+//       data: {
+//         totalAppUsers,   
+//         totalUsers,     
+//         totalChildren,   
+//         genderStats: {
+//           maleUsers,
+//           femaleUsers,
+//         },
+//         pregnancyStats: {
+//           pregnantWomen,
+//           nonPregnantWomen,
+//         },
+//         parentStats: {
+//           fathers,
+//           marriedWomen,
+//           usersWithChildren,
+//         },
+//       },
+//     });
+
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch analytics",
+//       error: error.message,
+//     });
+//   }
+// };
+// ------------------ CHILD CONTROLLERS ------------------
+export const getAppAnalytics = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const totalUsers = await User.countDocuments();
+    const totalChildren = await Child.countDocuments();
+    const totalAppUsers = totalUsers + totalChildren;
+
+    /* -------------------- TIME RANGES -------------------- */
+    const last24Hours = new Date(now - 24 * 60 * 60 * 1000);
+    const last7Days = new Date(now - 7 * 24 * 60 * 60 * 1000);
+    const last30Days = new Date(now - 30 * 24 * 60 * 60 * 1000);
+
+    /* -------------------- ACTIVE USERS -------------------- */
+    const activeToday = await User.countDocuments({
+      lastLogin: { $gte: last24Hours }
+    });
+
+    const activeThisWeek = await User.countDocuments({
+      lastLogin: { $gte: last7Days }
+    });
+
+    const activeThisMonth = await User.countDocuments({
+      lastLogin: { $gte: last30Days }
+    });
+
+    /* -------------------- INACTIVE USERS -------------------- */
+    const inactiveUsers = await User.find({
+      $or: [
+        { lastLogin: { $lt: last30Days } },
+        { lastLogin: null }
+      ]
+    }).select("name email phone lastLogin gender");
+
+    const inactiveUsersCount = inactiveUsers.length;
+
+    /* -------------------- GENDER -------------------- */
     const maleUsers = await User.countDocuments({ gender: "Male" });
     const femaleUsers = await User.countDocuments({ gender: "Female" });
 
-   
+    /* -------------------- PREGNANCY -------------------- */
     const pregnantWomen = await User.countDocuments({
       gender: "Female",
       pregnancyStage: "Pregnancy",
     });
 
-   
     const nonPregnantWomen = await User.countDocuments({
       gender: "Female",
       pregnancyStage: { $ne: "Pregnancy" },
     });
 
+    /* -------------------- PARENTHOOD -------------------- */
     const fathers = await User.countDocuments({
       gender: "Male",
       fatherStatus: "Father",
     });
 
-  
     const marriedWomen = await User.countDocuments({
       gender: "Female",
       maritalStatus: "Married",
     });
 
-    
     const usersWithChildren = await User.countDocuments({
       children: { $exists: true, $ne: [] },
     });
 
     return res.status(200).json({
       success: true,
-      message: "App analytics fetched successfully",
+      message: "Analytics fetched successfully",
       data: {
-        totalAppUsers,   
-        totalUsers,     
-        totalChildren,   
+        total: {
+          totalAppUsers,
+          totalUsers,
+          totalChildren,
+        },
+
+        activity: {
+          activeToday,
+          activeThisWeek,
+          activeThisMonth,
+          inactiveUsersCount,
+          inactiveUsersDetails: inactiveUsers, // for email/SMS engagement
+        },
+
         genderStats: {
           maleUsers,
           femaleUsers,
         },
+
         pregnancyStats: {
           pregnantWomen,
           nonPregnantWomen,
         },
+
         parentStats: {
           fathers,
           marriedWomen,
@@ -417,7 +530,6 @@ export const getAppAnalytics = async (req, res) => {
     });
   }
 };
-// ------------------ CHILD CONTROLLERS ------------------
 
 
 export const createChild = async (req, res) => {
@@ -594,7 +706,6 @@ export const getChildById = async (req, res) => {
 
 export const childLogin = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const child = await Child.findOne({ email });
     if (!child) {
@@ -604,7 +715,6 @@ export const childLogin = async (req, res) => {
         message: "Child not found",
       });
     }
-
     const isPasswordValid = await child.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -613,13 +723,13 @@ export const childLogin = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-
+  child.lastLogin = new Date();
+    await child.save();
     const token = jwt.sign(
       { id: child._id, role: "child" },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "1d" }
     );
-
     res.status(200).json({
       status: "success",
       success: true,
