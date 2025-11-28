@@ -2,7 +2,8 @@ import express  from "express";
 import { verifyAdmin ,verifyJWT} from "../utils/verifyToken.js";
 import { createNewUser, deleteUser, getAllUsers, 
          getSingleUser, updateUser,loginUser ,createChild,getAllChildren,getChildById, childLogin,
-         getAppAnalytics} from "../Controllers/userController.js";
+         getAppAnalytics,
+         sendInactiveUserEmailController} from "../Controllers/userController.js";
          import { upload } from '../MiddleWares/multer.middleware.js';
 const router = express.Router()              
 router.post('/adult/loginUser',loginUser)
@@ -15,6 +16,7 @@ router.get('/adult/getAllChild', verifyJWT,getAllChildren)
 router.get('/getchildbyid/:id', verifyJWT, getChildById)
 router.post('/child/createChild', createChild)
 router.get("/analytics", verifyJWT, verifyAdmin,getAppAnalytics);
+router.post("/send-inactive-email", sendInactiveUserEmailController);
 
 router.get('/', getAllUsers)
 export default router

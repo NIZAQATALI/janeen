@@ -8,6 +8,7 @@ import { getPregnancyInfo } from "../utils/constant/userState.js";
 import { getChildCategory } from "../utils/constant/childState.js"; 
 import Notificationprefrence from '../models/Notificationprefrence.js';
 import Notification from '../models/Notification.js';
+import { sendInactiveUserEmail } from '../utils/email.js';
 export const createNewUser = async (req, res) => {
   try {
     const {
@@ -751,6 +752,50 @@ export const childLogin = async (req, res) => {
       success: false,
       message: "Login failed",
       error: err.message,
+    });
+  }
+};
+export const sendInactiveUserEmailController = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId is required.",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    if (!user.email) {
+      return res.status(400).json({
+        success: false,
+        message: "User does not have a valid email.",
+      });
+    }
+
+  
+    await sendInactiveUserEmail(user.email, user.username);
+
+    return res.status(200).json({
+      success: true,
+      message: "Engagement email sent successfully.",
+    });
+
+  } catch (error) {
+    console.error("Error sending inactive user email:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send email.",
+      error: error.message,
     });
   }
 };

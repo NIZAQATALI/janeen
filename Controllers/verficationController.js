@@ -80,7 +80,6 @@ export const sendVerificationCode = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    // Send email using nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
