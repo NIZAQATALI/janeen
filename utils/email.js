@@ -264,164 +264,99 @@ Come back and explore!
 const html=
 `<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8" />
-  <title>We Miss You</title>
-</head>
+  <body style="margin:0; padding:0; background-color:#f5f5f5; font-family:Arial, sans-serif;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" 
+      style="background-color:#f5f5f5; padding: 30px 0;">
 
-<body style="margin:0; padding:0; background:#f4f7fa; font-family:Arial, sans-serif;">
+      <tr>
+        <td align="center">
 
-  <!-- MAIN WRAPPER -->
-  <table width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fa; padding:20px 0;">
-    <tr>
-      <td align="center">
+          <!-- Main container -->
+          <table width="600" border="0" cellspacing="0" cellpadding="0"
+            style="background:#ffffff; border-radius:8px; overflow:hidden;">
 
-        <!-- EMAIL CONTAINER -->
-        <table width="600" cellpadding="0" cellspacing="0" 
-               style="background:white; border-radius:12px; overflow:hidden;">
+            <!-- Header with Logo -->
+            <tr>
+              <td align="center" 
+                style="padding:20px; background:#fefcf4;">
+                <img src="https://res.cloudinary.com/dqcimdgce/image/upload/v1764434864/mylogo_JANEEN_isd8sf.png" 
+                  alt="Janeen Logo"
+                  style="width:120px; height:auto; display:block;">
+              </td>
+            </tr>
 
-          <!-- LOGO -->
-          <tr>
-            <td align="center" style="padding:30px;">
-              <img src="https://res.cloudinary.com/dqcimdgce/image/upload/v1764434864/mylogo_JANEEN_isd8sf.png"
-                   alt="App Logo"
-                   style="max-width:140px;">
-            </td>
-          </tr>
+            <!-- Content box -->
+            <tr>
+              <td style="padding: 30px;">
 
-          <!-- TITLE -->
-          <tr>
-            <td align="center" style="padding:0 30px;">
-              <h1 style="font-size:24px; color:#222; margin:0;">
-                A lot has changed since you last visited
-              </h1>
-            </td>
-          </tr>
+                <h2 style="color:#333333; margin:0 0 10px; font-size:22px;">
+                  We Miss You at Janeen!
+                </h2>
 
-          <!-- SUBTITLE -->
-          <tr>
-            <td align="center" style="padding:10px 40px 25px; color:#555; font-size:15px; line-height:22px;">
-              We've added new features, improvements, and experiences created just for you.
-            </td>
-          </tr>
+                <p style="color:#555555; font-size:15px; line-height:22px; margin:0 0 15px;">
+                   <strong>Greetings</strong>,
+                </p>
 
-          <!-- CTA BUTTON -->
-          <tr>
-            <td align="center" style="padding:10px 0 25px;">
-              <a href="http://localhost:5174/login"
-                 style="padding:12px 25px; background:#4CAF50; color:white; 
-                        font-size:16px; border-radius:6px; text-decoration:none;">
-                See what's new
-              </a>
-            </td>
-          </tr>
+                <p style="color:#555555; font-size:15px; line-height:22px; margin:0 0 20px;">
+                  It's been a while since you last visited Janeen. We’ve introduced new updates,
+                  improvements, and helpful parenting tools we don’t want you to miss!
+                </p>
 
-          <!-- SECTION TITLE -->
-          <tr>
-            <td align="center" style="padding:10px 0;">
-              <h2 style="margin:0; font-size:20px; color:#333;">
-                Come back to:
-              </h2>
-            </td>
-          </tr>
+                <h3 style="color:#333333; font-size:18px; margin:0 0 12px;">
+                  Here’s What’s New:
+                </h3>
 
-          <!-- FEATURE BLOCKS -->
-          <tr>
-            <td style="padding:20px 30px;">
+                <ul style="font-size:15px; color:#555555; padding-left:20px; margin:0 0 20px;">
+                  <li>New health and parenting content for families</li>
+                  <li>Improved user experience in the app</li>
+                  <li>Helpful reminders and notifications</li>
+                  <li>Janeen AI Chatbot (coming soon!)</li>
+                </ul>
 
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
+                <!-- CTA Button -->
+                <div style="text-align:center; margin: 30px 0;">
+                  <a href="http://localhost:5173/login" 
+                    style="
+                      background:#4CAF50;
+                      color:#ffffff;
+                      padding:12px 25px;
+                      font-size:16px;
+                      border-radius:6px;
+                      text-decoration:none;
+                      display:inline-block;
+                    ">
+                    Open Janeen App
+                  </a>
+                </div>
 
-                  <!-- FEATURE 1 -->
-                  <td width="50%" valign="top" style="padding:10px;">
-                    <img src="https://images.pexels.com/photos/4065876/pexels-photo-4065876.jpeg"
-                         alt="Feature 1"
-                         style="width:100%; border-radius:10px;">
-                    <h3 style="font-size:16px; margin:10px 0 5px; color:#222;">
-                      New Dashboard
-                    </h3>
-                    <p style="font-size:14px; color:#555; margin:0;">
-                      Navigate easier with a faster, redesigned experience.
-                    </p>
-                  </td>
+                <p style="color:#777777; font-size:13px; line-height:20px; margin-top:25px;">
+                  Thank you for being a part of the Janeen community.  
+                  We’re excited to have you back!
+                </p>
 
-                  <!-- FEATURE 2 -->
-                  <td width="50%" valign="top" style="padding:10px;">
-                    <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg"
-                         alt="Feature 2"
-                         style="width:100%; border-radius:10px;">
-                    <h3 style="font-size:16px; margin:10px 0 5px; color:#222;">
-                      Smart Recommendations
-                    </h3>
-                    <p style="font-size:14px; color:#555; margin:0;">
-                      Personalized suggestions based on your preferences.
-                    </p>
-                  </td>
+                <p style="color:#333333; font-size:14px; font-weight:bold; margin-top:20px;">
+                  — The Janeen Team
+                </p>
 
-                </tr>
+              </td>
+            </tr>
 
-                <tr>
+            <!-- Footer -->
+            <tr>
+              <td align="center"
+                style="padding:15px; background:#f0f0f0; color:#888888;
+                font-size:12px;">
+                © 2025 Janeen. All rights reserved.
+              </td>
+            </tr>
 
-                  <!-- FEATURE 3 -->
-                  <td width="50%" valign="top" style="padding:10px;">
-                    <img src="https://images.pexels.com/photos/1181353/pexels-photo-1181353.jpeg"
-                         alt="Feature 3"
-                         style="width:100%; border-radius:10px;">
-                    <h3 style="font-size:16px; margin:10px 0 5px; color:#222;">
-                      Faster Performance
-                    </h3>
-                    <p style="font-size:14px; color:#555; margin:0;">
-                      Enjoy smoother animations and faster load times.
-                    </p>
-                  </td>
+          </table>
+        </td>
+      </tr>
 
-                  <!-- FEATURE 4 -->
-                  <td width="50%" valign="top" style="padding:10px;">
-                    <img src="https://images.pexels.com/photos/3184306/pexels-photo-3184306.jpeg"
-                         alt="Feature 4"
-                         style="width:100%; border-radius:10px;">
-                    <h3 style="font-size:16px; margin:10px 0 5px; color:#222;">
-                      Fresh Weekly Content
-                    </h3>
-                    <p style="font-size:14px; color:#555; margin:0;">
-                      New guides, articles & tips added every week.
-                    </p>
-                  </td>
-
-                </tr>
-
-              </table>
-            </td>
-          </tr>
-
-          <!-- FOOTER CTA -->
-          <tr>
-            <td align="center" style="padding:25px;">
-              <a href="http://localhost:5174/login"
-                 style="padding:12px 25px; background:#4CAF50; color:white; 
-                        font-size:16px; border-radius:6px; text-decoration:none;">
-                Return to the App
-              </a>
-            </td>
-          </tr>
-
-          <!-- FOOTER -->
-          <tr>
-            <td align="center" style="padding:20px; color:#888; font-size:12px;">
-              © 2025 janeen • All Rights Reserved <br>
-              You are receiving this email because your account is inactive.
-            </td>
-          </tr>
-
-        </table>
-
-      </td>
-    </tr>
-  </table>
-
-</body>
+    </table>
+  </body>
 </html>
-
 `
   await sendEmail(email, subject, text, html);
 };
