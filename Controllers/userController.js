@@ -421,6 +421,116 @@ export const getAllUsers = async (req, res) => {
 //   }
 // };
 // ------------------ CHILD CONTROLLERS ------------------
+// export const getAppAnalytics = async (req, res) => {
+//   try {
+//     const now = new Date();
+
+//     const totalUsers = await User.countDocuments();
+//     const totalChildren = await Child.countDocuments();
+//     const totalAppUsers = totalUsers + totalChildren;
+
+//     /* -------------------- TIME RANGES -------------------- */
+//     const last24Hours = new Date(now - 24 * 60 * 60 * 1000);
+//     const last7Days = new Date(now - 7 * 24 * 60 * 60 * 1000);
+//     const last30Days = new Date(now - 30 * 24 * 60 * 60 * 1000);
+
+//     /* -------------------- ACTIVE USERS -------------------- */
+//     const activeToday = await User.countDocuments({
+//       lastLogin: { $gte: last24Hours }
+//     });
+
+//     const activeThisWeek = await User.countDocuments({
+//       lastLogin: { $gte: last7Days }
+//     });
+
+//     const activeThisMonth = await User.countDocuments({
+//       lastLogin: { $gte: last30Days }
+//     });
+
+//     /* -------------------- INACTIVE USERS -------------------- */
+//     const inactiveUsers = await User.find({
+//       $or: [
+//         { lastLogin: { $lt: last30Days } },
+//         { lastLogin: null }
+//       ]
+//     }).select("name email phone lastLogin gender");
+
+//     const inactiveUsersCount = inactiveUsers.length;
+
+//     /* -------------------- GENDER -------------------- */
+//     const maleUsers = await User.countDocuments({ gender: "Male" });
+//     const femaleUsers = await User.countDocuments({ gender: "Female" });
+
+//     /* -------------------- PREGNANCY -------------------- */
+//     const pregnantWomen = await User.countDocuments({
+//       gender: "Female",
+//       pregnancyStage: "Pregnancy",
+//     });
+
+//     const nonPregnantWomen = await User.countDocuments({
+//       gender: "Female",
+//       pregnancyStage: { $ne: "Pregnancy" },
+//     });
+
+//     /* -------------------- PARENTHOOD -------------------- */
+//     const fathers = await User.countDocuments({
+//       gender: "Male",
+//       fatherStatus: "Father",
+//     });
+
+//     const marriedWomen = await User.countDocuments({
+//       gender: "Female",
+//       maritalStatus: "Married",
+//     });
+
+//     const usersWithChildren = await User.countDocuments({
+//       children: { $exists: true, $ne: [] },
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Analytics fetched successfully",
+//       data: {
+//         total: {
+//           totalAppUsers,
+//           totalUsers,
+//           totalChildren,
+//         },
+
+//         activity: {
+//           activeToday,
+//           activeThisWeek,
+//           activeThisMonth,
+//           inactiveUsersCount,
+//           inactiveUsersDetails: inactiveUsers, // for email/SMS engagement
+//         },
+
+//         genderStats: {
+//           maleUsers,
+//           femaleUsers,
+//         },
+
+//         pregnancyStats: {
+//           pregnantWomen,
+//           nonPregnantWomen,
+//         },
+
+//         parentStats: {
+//           fathers,
+//           marriedWomen,
+//           usersWithChildren,
+//         },
+//       },
+//     });
+
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch analytics",
+//       error: error.message,
+//     });
+//   }
+// };
 export const getAppAnalytics = async (req, res) => {
   try {
     const now = new Date();
@@ -487,6 +597,22 @@ export const getAppAnalytics = async (req, res) => {
       children: { $exists: true, $ne: [] },
     });
 
+    /* -------------------- CHILD BREAKDOWN -------------------- */
+    const childrenWithParent = await Child.countDocuments({ parent: { $ne: null } });
+
+    const childrenWithoutParent = await Child.countDocuments({ parent: null });
+
+    const activeChildren = await Child.countDocuments({
+      lastLogin: { $gte: last30Days }
+    });
+
+    const inactiveChildren = await Child.countDocuments({
+      $or: [
+        { lastLogin: { $lt: last30Days } },
+        { lastLogin: null }
+      ]
+    });
+
     return res.status(200).json({
       success: true,
       message: "Analytics fetched successfully",
@@ -502,7 +628,7 @@ export const getAppAnalytics = async (req, res) => {
           activeThisWeek,
           activeThisMonth,
           inactiveUsersCount,
-          inactiveUsersDetails: inactiveUsers, // for email/SMS engagement
+          inactiveUsersDetails: inactiveUsers,
         },
 
         genderStats: {
@@ -520,6 +646,14 @@ export const getAppAnalytics = async (req, res) => {
           marriedWomen,
           usersWithChildren,
         },
+
+        childStats: {
+          totalChildren,
+          childrenWithParent,
+          childrenWithoutParent,
+          activeChildren,
+          inactiveChildren,
+        }
       },
     });
 
@@ -533,36 +667,93 @@ export const getAppAnalytics = async (req, res) => {
 };
 
 
+// export const createChild = async (req, res) => {
+//   try {
+//     const { name, age, gender, parentId, email, password, category, ageRange,birthDate } = req.body;
+//     const parent = await User.findById(parentId);
+//     if (!parent) {
+//       return res.status(404).json({ message: "Parent not found" });
+//     }
+//     const newChild = new Child({
+//       name,
+//       age,
+//       gender,
+//       birthDate,
+//       parent: parentId,
+//       email,
+//       password,
+//       role: "child",
+//       category,
+//       ageRange,
+//     });
+//     const savedChild = await newChild.save();
+
+//     parent.children.push(savedChild._id);
+//     await parent.save();
+
+//     res.status(201).json({
+//       message: "Child successfully created",
+//       data: savedChild,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Error creating child",
+//       error: error.message,
+//     });
+//   }
+// };
 export const createChild = async (req, res) => {
   try {
-    const { name, age, gender, parentId, email, password, category, ageRange,birthDate } = req.body;
-    const parent = await User.findById(parentId);
-    if (!parent) {
-      return res.status(404).json({ message: "Parent not found" });
+    const { 
+      name, 
+      gender, 
+      email, 
+      password, 
+      category, 
+      ageRange, 
+      birthDate, 
+      parentId 
+    } = req.body;
+
+    let parent = null;
+
+   
+    if (parentId) {
+      parent = await User.findById(parentId);
+      if (!parent) {
+        return res.status(404).json({ success: false, message: "Parent not found" });
+      }
     }
+
     const newChild = new Child({
       name,
-      age,
       gender,
-      birthDate,
-      parent: parentId,
       email,
       password,
-      role: "child",
       category,
       ageRange,
+      birthDate,
+      parent: parentId || null,   // ← KEY POINT
+      role: "child",
     });
+
     const savedChild = await newChild.save();
 
-    parent.children.push(savedChild._id);
-    await parent.save();
+    // If child is created under a parent, add to parent.children list
+    if (parent) {
+      parent.children.push(savedChild._id);
+      await parent.save();
+    }
 
     res.status(201).json({
-      message: "Child successfully created",
+      success: true,
+      message: parent ? "Child created and linked to parent" : "Child created without parent",
       data: savedChild,
     });
+
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: "Error creating child",
       error: error.message,
     });
