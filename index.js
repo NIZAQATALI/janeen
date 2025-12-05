@@ -67,6 +67,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 import userRoute from './routes/users.js';
+import blogRoute from './routes/blog.js';
 import authRoute from './routes/auth.js';
 import notificationRoutes from "./routes/notification.js";
 import { startAgenda } from './utils/agenda.js';
@@ -140,6 +141,7 @@ app.get('/db-check', (req, res) => {
 
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/blogs', blogRoute);
 app.use("/api/v1/notifications", notificationRoutes);
 
 /* ---------------------- 5. MONGO + SERVER + AGENDA START ---------------------- */
