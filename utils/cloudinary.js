@@ -87,4 +87,4 @@ export const uploadOnCloudinary = async (fileBuffer, folderName) => {
   }
 };
 
-export { uploadOnCloudinary };
+
