@@ -5,6 +5,7 @@ import { createNewUser, deleteUser, getAllUsers,
          getAppAnalytics,
          sendInactiveUserEmailController} from "../Controllers/userController.js";
          import { upload } from '../MiddleWares/multer.middleware.js';
+       
 const router = express.Router()              
 router.post('/adult/loginUser',loginUser)
 router.post('/child/loginChild',childLogin)

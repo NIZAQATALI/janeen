@@ -13,6 +13,7 @@
   "author": "Nizaqat Ali",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^1.33.0",
     "agenda": "^5.0.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
