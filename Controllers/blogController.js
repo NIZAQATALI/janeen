@@ -95,7 +95,13 @@ export const getBlogBySlug = async (req, res) => {
 
     blog.views += 1;
     await blog.save();
-
+  if (req.user?.id) {
+      await awardPoints({
+        userId: req.user.id,
+        type: "READ_BLOG",
+        metadata: { blogId: blog._id },
+      });
+    }
     res.status(200).json({
       success: true,
       data: blog,

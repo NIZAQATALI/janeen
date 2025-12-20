@@ -3,6 +3,7 @@ import Agenda from "agenda";
 import NotificationTemplate from "../models/Notificationtemplate.js";
 import NotificationPreference from "../models/Notificationprefrence.js";
 import Notification from "../models/Notification.js";
+import { generateLeaderboardSnapshot } from "../utils/gamification/leaderboardservice.js";
 
 let agenda;
 
@@ -89,9 +90,32 @@ export const startAgenda = async (io) => {
       io.to(user.userId.toString()).emit("notification", notification);
     }
   });
+  // ---------------- LEADERBOARD SNAPSHOTS ----------------
+agenda.define("daily-leaderboard", async () => {
+  await generateLeaderboardSnapshot("daily");
+});
+
+agenda.define("weekly-leaderboard", async () => {
+  await generateLeaderboardSnapshot("weekly");
+});
+
+agenda.define("monthly-leaderboard", async () => {
+  await generateLeaderboardSnapshot("monthly");
+});
+
 
   // START AGENDA
   await agenda.start();
+await agenda.cancel({ name: {
+  $in: [
+    "send-daily-notifications",
+    "send-weekly-notifications",
+    "send-monthly-notifications",
+    "daily-leaderboard",
+    "weekly-leaderboard",
+    "monthly-leaderboard",
+  ]
+}});
 
   // Run jobs at 9 AM
  // await agenda.every("0 9 * * *", "send-daily-notifications");
@@ -99,7 +123,19 @@ export const startAgenda = async (io) => {
   await agenda.every("0 9 * * 1", "send-weekly-notifications");
   await agenda.every("0 9 1 * *", "send-monthly-notifications");
 
-  console.log("⏳ Agenda Jobs Scheduled with Stage-Based Notifications");
+ 
+  // ---------------- LEADERBOARD SCHEDULE ----------------
+
+// Daily leaderboard at 12:05 AM
+await agenda.every("5 0 * * *", "daily-leaderboard");
+
+// Weekly leaderboard (Sunday 12:10 AM)
+await agenda.every("10 0 * * 0", "weekly-leaderboard");
+
+// Monthly leaderboard (1st day 12:15 AM)
+await agenda.every("15 0 1 * *", "monthly-leaderboard");
+console.log("⏳ Agenda Jobs Scheduled (Notifications + Leaderboards)");
+
 };
 
 export default agenda;

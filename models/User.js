@@ -31,7 +31,14 @@ const userSchema = new mongoose.Schema(
     lastLogin: {
   type: Date,
   default: null,
-}
+},
+points: {
+  type: Number,
+  default: 0,
+},
+loginCount: { type: Number, default: 0 },
+blogsRead: { type: Number, default: 0 },
+blogsCreated: { type: Number, default: 0 },
 
   },
   { timestamps: true }

@@ -9,6 +9,7 @@ import { getChildCategory } from "../utils/constant/childState.js";
 import Notificationprefrence from '../models/Notificationprefrence.js';
 import Notification from '../models/Notification.js';
 import { sendInactiveUserEmail } from '../utils/email.js';
+import { awardPoints } from '../utils/gamification/pointservice.js';
 export const createNewUser = async (req, res) => {
   try {
     const {
@@ -109,7 +110,6 @@ console.log(normalizedEmail,"normalized email")
     });
   }
 };
-
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -121,7 +121,6 @@ export const loginUser = async (req, res) => {
         message: "User not found",
       });
     }
-
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -132,6 +131,10 @@ export const loginUser = async (req, res) => {
     }
 
       user.lastLogin = new Date();
+      await awardPoints({
+  userId: user._id,
+  type: "LOGIN"
+});
     await user.save();
     const token = jwt.sign(
       { id: user._id, role: user.role },
@@ -162,6 +165,30 @@ export const loginUser = async (req, res) => {
     });
   }
 };
+export const getLiveLeaderboard = async (req, res) => {
+  const users = await User.find()
+    .select("username points photo")
+    .sort({ points: -1 })
+    .limit(50);
+
+  res.json({ success: true, data: users });
+};
+const generateLeaderboardSnapshot = async (period) => {
+  const users = await User.find().sort({ points: -1 }).limit(100);
+
+  const ranked = users.map((u, i) => ({
+    userId: u._id,
+    points: u.points,
+    rank: i + 1
+  }));
+
+  await Leaderboard.create({
+    period,
+    users: ranked,
+    createdAt: new Date()
+  });
+};
+
 
 export const updateUser = async (req, res) => {
   const id = req.query.id;
@@ -224,72 +251,6 @@ export const deleteUser = async (req, res) => {
     });
   }
 };
-
-
-// export const getSingleUser = async (req, res) => {
-//        const id = req.query.id || req.user._id;
-//   try {
-//     const singleUser = await User.findOne({ _id: id }).select("-password");
-//     if (!singleUser) {
-//       return res.status(404).json({
-//         status: "failed",
-//         success: false,
-//         message: "User not found.",
-//       });
-//     }
-//     res.status(200).json({
-//       status: "success",
-//       success: true,
-//       message: "Successful",
-//       data: singleUser,
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       status: "failed",
-//       success: false,
-//       message: "Could not fetch user data.",
-//       error: err.message,
-//     });
-//   }
-// };
-
-
-
-// export const getSingleUser = async (req, res) => {
-//   const id = req.query.id || req.user._id;
-
-//   try {
-//     const singleUser = await User.findOne({ _id: id }).select("-password");
-
-//     if (!singleUser) {
-//       return res.status(404).json({
-//         status: "failed",
-//         success: false,
-//         message: "User not found.",
-//       });
-//     }
-
-  
-//     const pregnancyInfo = getPregnancyInfo(singleUser);
-
-//     res.status(200).json({
-//       status: "success",
-//       success: true,
-//       message: "Successful",
-//       data: {
-//         ...singleUser.toObject(), 
-//         pregnancyInfo,           
-//       },
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       status: "failed",
-//       success: false,
-//       message: "Could not fetch user data.",
-//       error: err.message,
-//     });
-//   }
-// };
 
 export const getSingleUser = async (req, res) => {
   const id =  req.user._id;
