@@ -4,11 +4,14 @@
   "description": "MERN-EventsApp backend",
   "type": "module",
   "main": "index.js",
+ 
+  
   "scripts": {
-    "start": "nodemon index.js",
-    "start-dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
+
+
   "keywords": [],
   "author": "Nizaqat Ali",
   "license": "ISC",
