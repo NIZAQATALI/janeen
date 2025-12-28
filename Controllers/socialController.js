@@ -16,7 +16,7 @@ export const shareOnSocial = async (req, res) => {
       type: "SHARE_SOCIAL",
       metadata: {
         blogId,
-        platform, // facebook | whatsapp | twitter | linkedin
+        platform, 
       },
     });
 
