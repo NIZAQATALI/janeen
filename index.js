@@ -110,9 +110,7 @@ io.on("connection", (socket) => {
 /* ---------------------- 3. MIDDLEWARE ---------------------- */
 app.use(express.json());
 const allowedOrigins = [
-  'http://localhost:5173', 
-  
-];
+  'http://localhost:5173'];
 
 app.use(
   cors({
