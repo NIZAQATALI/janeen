@@ -109,7 +109,26 @@ io.on("connection", (socket) => {
 
 /* ---------------------- 3. MIDDLEWARE ---------------------- */
 app.use(express.json());
-app.use(cors({ origin: true, credentials: true }));
+const allowedOrigins = [
+  'http://localhost:5173', 
+  
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS not allowed from this origin: ' + origin));
+      }
+    },
+    credentials: true, // allow cookies and auth headers
+  })
+);
+// app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 
 // Attach io to request object so controllers can emit notification
