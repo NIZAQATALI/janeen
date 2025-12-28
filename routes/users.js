@@ -16,7 +16,7 @@ router.get('/adult/getUser', verifyJWT,getSingleUser)
 router.get('/adult/getAllChild', verifyJWT,getAllChildren)
 router.get('/getchildbyid/:id', verifyJWT, getChildById)
 router.post('/child/createChild', createChild)
-router.get("/analytics", verifyJWT, verifyAdmin,getAppAnalytics);
+router.get("/analytics", verifyJWT,getAppAnalytics);
 router.post("/send-inactive-email", sendInactiveUserEmailController);
 
 router.get('/', getAllUsers)

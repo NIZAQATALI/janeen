@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const badgeSchema = new mongoose.Schema({
   name: String,
-  icon: String,
+  iconUrl: String,
   category: String,
-  pointsRequired: Number,
+  points: Number,
   description: String
 }, { timestamps: true });
 

@@ -73,6 +73,7 @@ import notificationRoutes from "./routes/notification.js";
 import badgeRoute from "./routes/badge.js";
 import leaderboardRoute from "./routes/leaderboard.js";
 import geminiRoutes from "./routes/gaminai.js";
+import shareRoutes from "./routes/social.js";
 import { startAgenda } from './utils/agenda.js';
 
 dotenv.config({ path: './config.env' });
@@ -149,6 +150,7 @@ app.use('/api/v1/badges', badgeRoute);
 app.use('/api/v1/leaderboards', leaderboardRoute);
 app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/v1/gemini", geminiRoutes);
+app.use("/api/v1/share", shareRoutes);
 
 
 
@@ -177,4 +179,3 @@ const startServer = async () => {
 };
 
 startServer();
-export default app;

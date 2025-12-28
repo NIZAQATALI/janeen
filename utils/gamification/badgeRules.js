@@ -1,4 +1,4 @@
-// utils/gamification/badgeRules.js
+
 
 export const BADGE_RULES = [
   {

@@ -1,6 +1,7 @@
 import Blog from "../models/Blog.js";
 import User from "../models/User.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { awardPoints } from "../utils/gamification/pointservice.js";
 
 export const createBlog = async (req, res) => {
   try {

@@ -1,6 +1,6 @@
 import Badge from "../models/Badge.js";
 
-// Create a new badge
+
 export const createBadge = async (req, res) => {
   try {
     const { name, description, iconUrl, points } = req.body;
@@ -8,7 +8,7 @@ export const createBadge = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const badge = await Badge.create({ name, description, iconUrl, points });
+    const badge = await Badge.create({ name, description, iconUrl:iconUrl, points:points });
     return res.status(201).json(badge);
   } catch (error) {
     console.error("Error creating badge:", error);

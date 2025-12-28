@@ -20,9 +20,9 @@ const router = express.Router();
 router.post("/admin/template", verifyJWT,verifyAdmin, createOrUpdateTemplate);
 
 
-router.get("/admin/template", verifyJWT, verifyAdmin, getAllTemplates);
-router.get("/admin/template/:id", verifyJWT, verifyAdmin, getSingleTemplate);
-router.delete("/admin/template/:id", verifyJWT, verifyAdmin, deleteTemplate);
+router.get("/admin/template", verifyJWT,  getAllTemplates);//verifyAdmin
+router.get("/admin/template/:id", verifyJWT, getSingleTemplate);//verifyAdmin
+router.delete("/admin/template/:id", verifyJWT,  deleteTemplate);//verifyAdmin
 router.post("/preference", verifyJWT, setNotificationPreference);
 
 router.get("/", verifyJWT, getUserNotifications);
