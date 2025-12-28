@@ -13,6 +13,7 @@ const router = express.Router();
 router.post("/create", upload.single("thumbnail"), createBlog);
 router.get("/", getAllBlogs);
 router.get("/:slug", verifyJWT,getBlogBySlug);
+router.get("public/:slug",getBlogBySlug);
 router.put("/update/:id", updateBlog);
 router.delete("/delete/:id", deleteBlog);
 router.patch("/publish/:id", togglePublishBlog);

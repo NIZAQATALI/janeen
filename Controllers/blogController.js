@@ -112,6 +112,7 @@ export const getBlogBySlug = async (req, res) => {
     res.status(500).json({ success: false, message: "Error fetching blog", error: error.message });
   }
 };
+
 export const updateBlog = async (req, res) => {
   try {
     const updated = await Blog.findByIdAndUpdate(req.params.id, req.body, {
