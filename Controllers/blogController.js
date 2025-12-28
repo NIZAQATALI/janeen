@@ -1,7 +1,6 @@
 import Blog from "../models/Blog.js";
 import User from "../models/User.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import { awardPoints } from "../utils/gamification/pointservice.js";
 
 export const createBlog = async (req, res) => {
   try {
@@ -97,11 +96,11 @@ export const getBlogBySlug = async (req, res) => {
     blog.views += 1;
     await blog.save();
   if (req.user?.id) {
-      await awardPoints({
-        userId: req.user.id,
-        type: "READ_BLOG",
-        metadata: { blogId: blog._id },
-      });
+      // await awardPoints({
+      //   userId: req.user.id,
+      //   type: "READ_BLOG",
+      //   metadata: { blogId: blog._id },
+      // });
     }
     res.status(200).json({
       success: true,
