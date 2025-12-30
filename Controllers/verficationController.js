@@ -82,7 +82,7 @@ export const sendVerificationCode = async (req, res) => {
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
-      port: 465,
+      port: 443,
   secure: true,
       auth: {
         user: process.env.SMTP_USER,
