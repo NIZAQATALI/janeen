@@ -89,14 +89,15 @@ export const getBlogBySlug = async (req, res) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.slug })
       .populate("author", "name email");
-
+  console.log("after author.")
     if (!blog) {
       return res.status(404).json({ success: false, message: "Blog not found" });
     }
-
+ console.log(" blog.views += 1;")
     blog.views += 1;
     await blog.save();
   if (req.user?.id) {
+    console.log("login user..................")
       await awardPoints({
         userId: req.user.id,
         type: "READ_BLOG",
